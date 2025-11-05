@@ -18,6 +18,79 @@ public class FrmEstudiante extends javax.swing.JFrame {
     public FrmEstudiante() {
         initComponents();
     }
+    
+    // ===================== MÉTODOS AUXILIARES =====================
+
+        // Verifica si un texto es un número entero válido
+    private boolean esEntero(String valor) {
+        if (valor == null || valor.trim().isEmpty()) return false;
+            try {
+                Integer.parseInt(valor.trim());
+                return true;
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }
+
+        // Verifica si un texto es un número decimal válido
+        private boolean esDecimal(String valor) {
+            if (valor == null || valor.trim().isEmpty()) return false;
+            try {
+                Double.parseDouble(valor.trim().replace(",", "."));
+                return true;
+            } catch (NumberFormatException e) {
+                return false;
+            }
+        }
+
+        // Limpia todos los campos del formulario
+        private void limpiarCampos() {
+            txtNombre.setText("");
+            txtEdad.setText("");
+            txtPromedio.setText("");
+            txtResultado.setText("");
+            lblStatus.setText("Listo.");
+            txtNombre.requestFocus();
+        }
+
+        // Valida los datos del formulario antes de guardar
+        private boolean validarFormulario() {
+            String nombre = txtNombre.getText().trim();
+            String sEdad = txtEdad.getText().trim();
+            String sProm = txtPromedio.getText().trim();
+
+            if (nombre.isEmpty()) {
+                lblStatus.setText("⚠️ El nombre es obligatorio.");
+                txtNombre.requestFocus();
+                return false;
+            }
+            if (!esEntero(sEdad)) {
+                lblStatus.setText("⚠️ La edad debe ser un número entero.");
+                txtEdad.requestFocus();
+                return false;
+            }
+            int edad = Integer.parseInt(sEdad);
+            if (edad <= 0 || edad > 120) {
+                lblStatus.setText("⚠️ La edad debe estar entre 1 y 120.");
+                txtEdad.requestFocus();
+                return false;
+            }
+
+            if (!esDecimal(sProm)) {
+                lblStatus.setText("⚠️ El promedio debe ser numérico.");
+                txtPromedio.requestFocus();
+                return false;
+            }
+            double prom = Double.parseDouble(sProm.replace(",", "."));
+            if (prom < 0 || prom > 100) {
+                lblStatus.setText("⚠️ El promedio debe estar entre 0 y 100.");
+                txtPromedio.requestFocus();
+                return false;
+            }
+
+            return true;
+        }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -78,6 +151,11 @@ public class FrmEstudiante extends javax.swing.JFrame {
         });
 
         btnLimpiar.setText("Limpiar");
+        btnLimpiar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLimpiarActionPerformed(evt);
+            }
+        });
 
         lblResultado.setText("Resultado");
 
@@ -167,8 +245,34 @@ public class FrmEstudiante extends javax.swing.JFrame {
     }//GEN-LAST:event_txtPromedioActionPerformed
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
-        // TODO add your handling code here:
+        if (!validarFormulario()) {
+        lblStatus.setForeground(new java.awt.Color(180, 0, 0)); // rojo si hay error
+        return;
+        }
+
+        // Si pasa la validación:
+        String nombre = txtNombre.getText().trim();
+        int edad = Integer.parseInt(txtEdad.getText().trim());
+        double promedio = Double.parseDouble(txtPromedio.getText().trim().replace(",", "."));
+
+        // Construir el texto del resultado
+        StringBuilder sb = new StringBuilder();
+        sb.append("Estudiante guardado:\n")
+          .append("Nombre: ").append(nombre).append("\n")
+          .append("Edad: ").append(edad).append(" años\n")
+          .append("Promedio: ").append(promedio);
+
+        txtResultado.setText(sb.toString());
+
+        // Cambiar color del estado a verde (éxito)
+        lblStatus.setText("✅ Guardado correctamente.");
+        lblStatus.setForeground(new java.awt.Color(0, 128, 0));
     }//GEN-LAST:event_btnGuardarActionPerformed
+
+    private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed
+        limpiarCampos();
+        lblStatus.setForeground(new java.awt.Color(0, 0, 0));
+    }//GEN-LAST:event_btnLimpiarActionPerformed
 
     /**
      * @param args the command line arguments
